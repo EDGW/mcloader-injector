@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java 8 for agent compatibility checks
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+      - name: Set up Java 21 for Gradle
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build and test on Java 21
+        run: ./gradlew build
+      - name: Test packaged agent on Java 8
+        env:
+          INJECTOR_TEST_JAVA: ${{ env.JAVA_HOME_8_X64 }}/bin/java
+        run: ./gradlew :agent:test --tests '*AgentIntegrationTest'
+      - name: Upload packaged agent
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcloader-injector-agent
+          path: agent/build/libs/mcloader-injector-agent.jar
+          if-no-files-found: error
