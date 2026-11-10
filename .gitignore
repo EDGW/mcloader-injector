@@ -1,0 +1,28 @@
+# Gradle caches and generated outputs
+.gradle/
+**/build/
+
+/plans
+
+# Tests
+/tests
+
+# Local IDE files
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# JVM diagnostics and runtime logs
+*.log
+*.hprof
+*.jfr
+hs_err_pid*
+replay_pid*
+
+# OS metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
